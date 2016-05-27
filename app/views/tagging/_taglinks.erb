@@ -1,8 +1,8 @@
-<tr>
-  <th><%= l(:field_tags) %>:</th>
-  <td>
+<div class="attribute">
+  <div class="label"><%= l(:field_tags) %>:</div>
+  <div>
   <% tags.each do |tag| %>
     <%= link_to_project_tag_filter(@project, tag) %>
   <% end %>
-  </td>
-</tr>
+  </div>
+</div>
