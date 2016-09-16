@@ -18,6 +18,15 @@ module RedmineTagging::Patches::IssuePatch
     alias_method_chain :create_journal, :tags
     alias_method_chain :init_journal, :tags
     alias_method_chain :copy_from, :tags
+
+    searchable_options[:columns] << 'issue_tags.tag'
+
+    original_scope = searchable_options[:scope] || self
+    searchable_options[:scope] = ->(*_) {
+      (original_scope.respond_to?(:call) ?
+         original_scope.call(*_) :
+         original_scope).includes :issue_tags
+    }
   end
 
   def create_journal_with_tags

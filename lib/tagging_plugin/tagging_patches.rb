@@ -34,6 +34,15 @@ module TaggingPlugin
         acts_as_taggable
 
         has_many :wiki_page_tags
+
+        searchable_options[:columns] << "wiki_page_tags.tag"
+
+        original_scope = searchable_options[:scope] || self
+        searchable_options[:scope] = ->(*_){
+          (original_scope.respond_to?(:call) ?
+             original_scope.call(*_) :
+             original_scope).includes :wiki_page_tags
+        }
       end
     end
 
