@@ -6,11 +6,10 @@ module RedmineTagging::Patches::WikiPagePatch
   included do
     unloadable
 
-    attr_writer :tags_to_update
-
     has_many :wiki_page_tags
 
     acts_as_taggable
+    safe_attributes :tags
 
     before_save :update_tags
 
@@ -29,6 +28,12 @@ module RedmineTagging::Patches::WikiPagePatch
           original_scope
         ).includes :wiki_page_tags
       }
+    end
+  end
+
+  def tags=(new_tags)
+    if new_tags
+      @tags_to_update = TaggingPlugin::TagsHelper.from_string(new_tags)
     end
   end
 
