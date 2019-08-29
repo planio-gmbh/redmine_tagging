@@ -45,7 +45,7 @@ class TaggingTest < ActionDispatch::IntegrationTest
   end
 
   def test_should_create_issue_tags_from_input
-    Setting.plugin_redmine_tagging[:issues_inline] = '0'
+    Setting.plugin_redmine_tagging["issues_inline"] = '0'
 
     @new_issue_attrs = {
       'project_id'  => @project_with_tags.id,
@@ -65,7 +65,7 @@ class TaggingTest < ActionDispatch::IntegrationTest
   end
 
   def test_should_update_issue_tags_from_input
-    Setting.plugin_redmine_tagging[:issues_inline] = '0'
+    Setting.plugin_redmine_tagging["issues_inline"] = '0'
 
     issue_attrs = @issue_with_tags.attributes
 
@@ -86,7 +86,7 @@ class TaggingTest < ActionDispatch::IntegrationTest
   end
 
   def test_should_create_inline_issue_tags
-    Setting.plugin_redmine_tagging[:issues_inline] = '1'
+    Setting.plugin_redmine_tagging["issues_inline"] = '1'
 
     @new_issue_attrs = {
       'project_id'  => @project_with_tags.id,
@@ -106,7 +106,7 @@ class TaggingTest < ActionDispatch::IntegrationTest
   end
 
   def test_should_update_inline_issue_tags
-    Setting.plugin_redmine_tagging[:issues_inline] = '1'
+    Setting.plugin_redmine_tagging["issues_inline"] = '1'
 
     issue_attrs = @issue_with_tags.attributes
 
@@ -145,7 +145,7 @@ class TaggingTest < ActionDispatch::IntegrationTest
   end
 
   def test_should_create_wiki_page_tags_from_input
-    Setting.plugin_redmine_tagging[:wiki_pages_inline] = '0'
+    Setting.plugin_redmine_tagging["wiki_pages_inline"] = '0'
 
     edit_page_path = edit_wiki_cpath(@project_with_wiki_tags, 'newpage')
     page_path = wiki_cpath(@project_with_wiki_tags, 'newpage')
@@ -168,7 +168,7 @@ class TaggingTest < ActionDispatch::IntegrationTest
   end
 
   def test_should_update_wiki_page_tags_from_input
-    Setting.plugin_redmine_tagging[:wiki_pages_inline] = '0'
+    Setting.plugin_redmine_tagging["wiki_pages_inline"] = '0'
 
     edit_page_path = edit_wiki_cpath(@project_with_wiki_tags, @wiki_page_with_tags.title)
     page_path = wiki_cpath(@project_with_wiki_tags, @wiki_page_with_tags.title)
@@ -189,7 +189,7 @@ class TaggingTest < ActionDispatch::IntegrationTest
   end
 
   def test_should_create_inline_wiki_page_tags
-    Setting.plugin_redmine_tagging[:wiki_pages_inline] = '1'
+    Setting.plugin_redmine_tagging["wiki_pages_inline"] = '1'
 
     edit_page_path = edit_wiki_cpath(@project_with_wiki_tags, 'newpage')
     page_path = wiki_cpath(@project_with_wiki_tags, 'newpage')
@@ -215,7 +215,7 @@ class TaggingTest < ActionDispatch::IntegrationTest
   end
 
   def test_should_update_inline_wiki_page_tags
-    Setting.plugin_redmine_tagging[:wiki_pages_inline] = '1'
+    Setting.plugin_redmine_tagging["wiki_pages_inline"] = '1'
 
     edit_page_path = edit_wiki_cpath(@project_with_wiki_tags, @wiki_page_with_tags.title)
     page_path = wiki_cpath(@project_with_wiki_tags, @wiki_page_with_tags.title)

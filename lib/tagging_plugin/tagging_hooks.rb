@@ -209,15 +209,15 @@ module TaggingPlugin
       end
 
       def issues_inline_tags?
-        Setting.plugin_redmine_tagging[:issues_inline] == '1'
+        Setting.plugin_redmine_tagging["issues_inline"] == '1'
       end
 
       def wiki_pages_inline_tags?
-        Setting.plugin_redmine_tagging[:wiki_pages_inline] == '1'
+        Setting.plugin_redmine_tagging["wiki_pages_inline"] == '1'
       end
 
       def sidebar_tagcloud?
-        Setting.plugin_redmine_tagging[:sidebar_tagcloud] == '1'
+        Setting.plugin_redmine_tagging["sidebar_tagcloud"] == '1'
       end
 
       def render_partial_to_string(context, partial_name, options = {})

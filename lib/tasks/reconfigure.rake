@@ -3,7 +3,7 @@ namespace :redmine do
     desc "Reconfigure for inline/separate tag editing"
     task :reconfigure => :environment do
 
-      if Setting.plugin_redmine_tagging[:issues_inline] == "1"
+      if Setting.plugin_redmine_tagging["issues_inline"] == "1"
         puts "Adding inline tags to issues"
 
         Issue.find_each do |issue|
@@ -33,7 +33,7 @@ namespace :redmine do
         }
       end
 
-      if Setting.plugin_redmine_tagging[:wiki_pages_inline] == "1"
+      if Setting.plugin_redmine_tagging["wiki_pages_inline"] == "1"
         puts "Adding inline tags to wikis"
 
         WikiContent.find(:all).each {|content|

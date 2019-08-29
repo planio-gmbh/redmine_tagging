@@ -54,7 +54,7 @@ module TaggingHelper
       min_max = tags.values.minmax
       distance = min_max[1] - min_max[0]
 
-      dynamic_fonts_enabled = (Setting.plugin_redmine_tagging[:dynamic_font_size] == "1")
+      dynamic_fonts_enabled = (Setting.plugin_redmine_tagging["dynamic_font_size"] == "1")
 
       tags.keys.sort_by { |t| t.downcase }.each do |tag|
         if dynamic_fonts_enabled && (distance != 0)
