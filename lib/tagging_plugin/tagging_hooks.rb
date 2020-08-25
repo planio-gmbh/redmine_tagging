@@ -84,6 +84,9 @@ module TaggingPlugin
         issue = context[:issue]
 
         if context[:params]['append_tags']
+          if issue.copy?
+            old_tags = issue.instance_variable_get(:@copied_from).tags_on(ContextHelper.context_for(issue.instance_variable_get(:@copied_from).project))
+          else
           tag_context = if issue.project_id_changed?
             ContextHelper.context_for(Project.find(issue.project_id_was))
           else
@@ -91,6 +94,7 @@ module TaggingPlugin
           end
 
           old_tags = issue.tags_on(tag_context)
+          end
 
           tags += ' ' + TagsHelper.to_string(old_tags.map(&:name)) if old_tags.present?
         end
