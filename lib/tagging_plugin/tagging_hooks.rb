@@ -196,7 +196,7 @@ module TaggingPlugin
 
       def view_reports_issue_report_split_content_right(context={})
         project_context = ContextHelper.context_for(context[:project])
-        tags            = ActsAsTaggableOn::Tagging.find_all_by_context(project_context).map(&:tag).uniq
+        tags            = ActsAsTaggableOn::Tag.for_context(project_context)
         tags_by_status  = IssueTag.by_issue_status(context[:project])
 
         <<-HTML
