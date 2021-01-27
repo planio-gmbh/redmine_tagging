@@ -8,7 +8,7 @@ module RedmineTagging::Patches::QueriesHelperPatch
   def column_content_with_tags(column, issue)
     value = column.value(issue)
 
-    if array_of_issue_tags?(value)
+    if value.class.name == 'Array' && value.first.class.name == 'IssueTag'
       links = value.map do |issue_tag|
         link_to_project_tag_filter(@project, issue_tag.tag)
       end
@@ -16,9 +16,5 @@ module RedmineTagging::Patches::QueriesHelperPatch
     else
       column_content_without_tags(column, issue)
     end
-  end
-
-  def array_of_issue_tags?(value)
-    value.class.name == 'Array' && value.first.class.name == 'IssueTag'
   end
 end
