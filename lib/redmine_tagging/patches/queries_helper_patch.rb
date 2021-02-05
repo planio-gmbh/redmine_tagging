@@ -6,7 +6,7 @@ module RedmineTagging::Patches::QueriesHelperPatch
   end
 
   def column_content_with_tags(column, issue)
-    value = column.value(issue)
+    value = column.value_object(issue)
 
     if value.class.name == 'Array' && value.first.class.name == 'IssueTag'
       links = value.map do |issue_tag|
