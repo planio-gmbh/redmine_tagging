@@ -1,3 +1,5 @@
+require 'rake/testtask'
+
 namespace :redmine_tagging do
 
   desc 'Runs the plugins tests.'
