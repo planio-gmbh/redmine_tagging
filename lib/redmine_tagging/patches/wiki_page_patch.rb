@@ -13,22 +13,16 @@ module RedmineTagging::Patches::WikiPagePatch
 
       before_save :update_tags
 
-      if Redmine::VERSION::MAJOR < 3
-        searchable_options[:columns] << "#{WikiPageTag.table_name}.tag"
-        searchable_options[:include] ||= []
-        searchable_options[:include] << :wiki_page_tags
-      else
-        searchable_options[:columns] << "#{WikiPageTag.table_name}.tag"
+      searchable_options[:columns] << "#{WikiPageTag.table_name}.tag"
 
-        original_scope = searchable_options[:scope] || self
+      original_scope = searchable_options[:scope] || self
 
-        searchable_options[:scope] = ->(*args) {
-          (original_scope.respond_to?(:call) ?
-            original_scope.call(*args) :
-            original_scope
-          ).includes :wiki_page_tags
-        }
-      end
+      searchable_options[:scope] = ->(*args) {
+        (original_scope.respond_to?(:call) ?
+          original_scope.call(*args) :
+          original_scope
+        ).includes :wiki_page_tags
+      }
     end
   end
 
