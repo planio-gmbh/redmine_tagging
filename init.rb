@@ -93,10 +93,10 @@ Redmine::Plugin.register :redmine_tagging do
 end
 
 Rails.configuration.to_prepare do
-  require 'tagging_plugin/tagging_patches'
   require 'redmine_tagging'
   require File.expand_path('../app/helpers/tagging_helper', __FILE__)
   ActionView::Base.send :include, TaggingHelper
+  ProjectsController.send :helper, RedmineTagging::Patches::ProjectSettingsTabs
 end
 
 require 'tagging_plugin/tagging_hooks'
