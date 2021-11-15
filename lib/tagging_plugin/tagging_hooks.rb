@@ -6,7 +6,7 @@ module TaggingPlugin
         sidebar_tagcloud? ? render_partial_to_string(context, 'tagging/tagcloud') : ''
       end
 
-      def view_wiki_sidebar_bottom(context = {})
+      def view_wiki_show_sidebar_bottom(context = {})
         sidebar_tagcloud? ? render_partial_to_string(context, 'tagging/tagcloud_search') : ''
       end
 
