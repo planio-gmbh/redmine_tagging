@@ -38,14 +38,14 @@ module ApplicationHelper
       WikiPage.tag_counts_on(context).each do |tag|
         tags[tag.name] = tags[tag.name].to_i + tag.count
       end
-    else
-      Issue.all_tag_counts.each do |tag|
-        tags[tag.name] = tag.count
-      end
-
-      WikiPage.all_tag_counts.each do |tag|
-        tags[tag.name] = tags[tag.name].to_i + tag.count
-      end
+#    else
+#      Issue.all_tag_counts.each do |tag|
+#        tags[tag.name] = tag.count
+#      end
+#
+#      WikiPage.all_tag_counts.each do |tag|
+#        tags[tag.name] = tags[tag.name].to_i + tag.count
+#      end
     end
 
     tags = tags.reject {|key,value| value == 0 }

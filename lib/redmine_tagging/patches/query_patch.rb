@@ -11,16 +11,18 @@ module RedmineTagging::Patches::QueryPatch
   end
 
   def available_filters
-    unless @available_tag_filter
-      @available_filters = super
-      @available_tag_filter = available_tags_filter
-      @available_filters.merge!(@available_tag_filter)
+    unless @available_filters
+      super
+      if project
+        @available_filters.merge!(available_tags_filter)
+      end
     end
     @available_filters
   end
 
   def available_tags_filter
     if project.nil?
+      # dead code branch, see above
       tags = ActsAsTaggableOn::Tag.where(
           "id in (select tag_id from taggings where taggable_type = 'Issue')"
       )

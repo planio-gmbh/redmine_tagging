@@ -1,13 +1,19 @@
+# frozen_string_literal: true
+
 module TaggingPlugin
   module Hooks
     class LayoutHook < Redmine::Hook::ViewListener
 
       def view_issues_sidebar_planning_bottom(context = {})
-        sidebar_tagcloud? ? render_partial_to_string(context, 'tagging/tagcloud') : ''
+        if RedmineTagging.sidebar_tagcloud? and context[:project].present?
+          render_partial_to_string(context, 'tagging/tagcloud')
+        end
       end
 
       def view_wiki_show_sidebar_bottom(context = {})
-        sidebar_tagcloud? ? render_partial_to_string(context, 'tagging/tagcloud_search') : ''
+        if RedmineTagging.sidebar_tagcloud?
+          render_partial_to_string(context, 'tagging/tagcloud_search')
+        end
       end
 
       def view_layouts_base_html_head(context = {})
@@ -15,7 +21,7 @@ module TaggingPlugin
       end
 
       def view_issues_show_details_bottom(context = {})
-        return '' if issues_inline_tags?
+        return '' if RedmineTagging.issues_inline_tags?
 
         issue       = context[:issue]
         tag_context = ContextHelper.context_for(issue.project)
@@ -25,21 +31,21 @@ module TaggingPlugin
       end
 
       def view_issues_form_details_bottom(context={})
-        return '' if issues_inline_tags?
+        return '' if RedmineTagging.issues_inline_tags?
 
-        issue  = context[:issue]
-        result = ''
+        issue, request, form = context.values_at :issue, :request, :form
+        result = +''
 
-        if context[:request].params[:issue] # update form
-          tags   = context[:request].params[:issue][:tags]
-          result += issue_tag_field context[:form], tags
+        if request.params[:issue] # update form
+          tags = request.params[:issue][:tags]
+          result += issue_tag_field form, tags
         else
           tag_context = ContextHelper.context_for(issue.project)
-          tags        = issue.tag_list_on(tag_context) \
-            .sort_by { |t| t.downcase } \
-            .map { |tag| tag.gsub(/^#/, '') } \
+          tags = issue.tag_list_on(tag_context)
+            .sort_by(&:downcase)
+            .map{ |tag| tag.delete_prefix '#' }
             .join(' ')
-          result      += issue_tag_field context[:form], tags
+          result += issue_tag_field form, tags
         end
 
         unless context[:request].xhr?
@@ -51,7 +57,7 @@ module TaggingPlugin
       end
 
       def controller_issues_bulk_edit_before_save(context={})
-        return if issues_inline_tags? || !has_tags_in_params?(context[:params])
+        return if RedmineTagging.issues_inline_tags? || !has_tags_in_params?(context[:params])
 
         tags  = context[:params]['issue']['tags'].to_s
         issue = context[:issue]
@@ -76,7 +82,7 @@ module TaggingPlugin
       end
 
       def controller_issues_edit_before_save(context={})
-        return if issues_inline_tags?
+        return if RedmineTagging.issues_inline_tags?
         return unless has_tags_in_params?(context[:params])
 
         issue = context[:issue]
@@ -90,21 +96,18 @@ module TaggingPlugin
 
       # wikis have no view hooks
       def view_layouts_base_content(context={})
-        return '' if wiki_pages_inline_tags?
-
-        return '' unless context[:controller].is_a?(WikiController)
+        return if RedmineTagging.wiki_pages_inline_tags?
+        return unless context[:controller].is_a?(WikiController)
 
         request = context[:request]
+        return unless request.parameters
 
-        return '' unless request.parameters
-
-        project = Project.find_by_identifier(request.parameters['project_id'])
-        return '' unless project
+        return unless project = Project.find(request.parameters['project_id'])
 
         page = project.wiki.find_page(request.parameters['id'])
 
         tag_context = ContextHelper.context_for(project)
-        tags        = ''
+        tags = +''
 
         if page && request.parameters['action'] == 'index'
           tags = page.tag_list_on(tag_context).sort_by { |t| t.downcase }.map do |tag|
@@ -183,18 +186,6 @@ module TaggingPlugin
 
       def has_tags_in_params?(params)
         params && params['issue'] && params['issue']['tags']
-      end
-
-      def issues_inline_tags?
-        Setting.plugin_redmine_tagging["issues_inline"] == '1'
-      end
-
-      def wiki_pages_inline_tags?
-        Setting.plugin_redmine_tagging["wiki_pages_inline"] == '1'
-      end
-
-      def sidebar_tagcloud?
-        Setting.plugin_redmine_tagging["sidebar_tagcloud"] == '1'
       end
 
       def render_partial_to_string(context, partial_name, options = {})
