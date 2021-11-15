@@ -1,7 +1,7 @@
-require_dependency 'project'
-
 module RedmineTagging::Patches::ProjectPatch
-  extend ActiveSupport::Concern
+  def self.apply
+    Project.send :prepend, self unless Project < self
+  end
 
   def tags
     ActsAsTaggableOn::Tag.
@@ -13,9 +13,5 @@ module RedmineTagging::Patches::ProjectPatch
         SQL
         ).order(:name).uniq
   end
-
 end
 
-unless Project.included_modules.include? RedmineTagging::Patches::ProjectPatch
-  Project.send :include, RedmineTagging::Patches::ProjectPatch
-end

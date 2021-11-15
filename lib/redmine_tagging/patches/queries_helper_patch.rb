@@ -1,8 +1,16 @@
 module RedmineTagging::Patches::QueriesHelperPatch
   extend ActiveSupport::Concern
 
+  def self.apply
+    QueriesHelper.send :include, self unless QueriesHelper.included_modules.include?(self)
+  end
+
   included do
-    alias_method_chain :column_content, :tags
+    # QueriesHelper is included all over the place, it's less brittle to patch
+    # it directly vs adding this as a new helper (that would call super)
+    # everywhere.
+    alias_method :column_content_without_tags, :column_content
+    alias_method :column_content, :column_content_with_tags
   end
 
   def column_content_with_tags(column, issue)

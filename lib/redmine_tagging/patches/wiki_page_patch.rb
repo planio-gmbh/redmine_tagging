@@ -1,33 +1,34 @@
-require_dependency 'wiki_page'
-
 module RedmineTagging::Patches::WikiPagePatch
-  extend ActiveSupport::Concern
 
-  included do
-    unloadable
+  def self.apply
+    WikiPage.prepend self unless WikiPage < self
+  end
 
-    has_many :wiki_page_tags
+  def self.prepended(base)
+    base.class_eval do
+      has_many :wiki_page_tags
 
-    acts_as_taggable
-    safe_attributes :tags
+      acts_as_taggable
+      safe_attributes :tags
 
-    before_save :update_tags
+      before_save :update_tags
 
-    if Redmine::VERSION::MAJOR < 3
-      searchable_options[:columns] << "#{WikiPageTag.table_name}.tag"
-      searchable_options[:include] ||= []
-      searchable_options[:include] << :wiki_page_tags
-    else
-      searchable_options[:columns] << "#{WikiPageTag.table_name}.tag"
+      if Redmine::VERSION::MAJOR < 3
+        searchable_options[:columns] << "#{WikiPageTag.table_name}.tag"
+        searchable_options[:include] ||= []
+        searchable_options[:include] << :wiki_page_tags
+      else
+        searchable_options[:columns] << "#{WikiPageTag.table_name}.tag"
 
-      original_scope = searchable_options[:scope] || self
+        original_scope = searchable_options[:scope] || self
 
-      searchable_options[:scope] = ->(*args) {
-        (original_scope.respond_to?(:call) ?
-          original_scope.call(*args) :
-          original_scope
-        ).includes :wiki_page_tags
-      }
+        searchable_options[:scope] = ->(*args) {
+          (original_scope.respond_to?(:call) ?
+            original_scope.call(*args) :
+            original_scope
+          ).includes :wiki_page_tags
+        }
+      end
     end
   end
 
@@ -47,9 +48,5 @@ module RedmineTagging::Patches::WikiPagePatch
 
     true
   end
-
 end
 
-unless WikiPage.included_modules.include? RedmineTagging::Patches::WikiPagePatch
-  WikiPage.send :include, RedmineTagging::Patches::WikiPagePatch
-end

@@ -1,21 +1,18 @@
-require_dependency 'query'
-
 module RedmineTagging::Patches::QueryPatch
-  extend ActiveSupport::Concern
 
-  included do
-    unloadable # Send unloadable so it will not be unloaded in development
-
-    alias_method_chain :available_filters, :tags
-    alias_method_chain :sql_for_field, :tags
-
-    tag_query_column = QueryColumn.new(:issue_tags, :caption => :field_tags)
-    add_available_column(tag_query_column)
+  def self.apply
+    Query.send :prepend, self unless Query < self
   end
 
-  def available_filters_with_tags
+  def self.prepended(base)
+    base.class_eval do
+      add_available_column QueryColumn.new(:issue_tags, :caption => :field_tags)
+    end
+  end
+
+  def available_filters
     unless @available_tag_filter
-      @available_filters = available_filters_without_tags
+      @available_filters = super
       @available_tag_filter = available_tags_filter
       @available_filters.merge!(@available_tag_filter)
     end
@@ -49,11 +46,11 @@ module RedmineTagging::Patches::QueryPatch
     filter
   end
 
-  def sql_for_field_with_tags(field, operator, v, db_table, db_field, is_custom_filter = false)
+  def sql_for_field(field, operator, v, db_table, db_field, is_custom_filter = false)
     if field == 'tags'
       tagging_sql(field, operator)
     else
-      sql_for_field_without_tags(field, operator, v, db_table, db_field, is_custom_filter)
+      super
     end
   end
 
@@ -90,7 +87,7 @@ module RedmineTagging::Patches::QueryPatch
   end
 
   def tag_without_sharp(tag)
-    tag.to_s.gsub /^\s*#/, ''
+    tag.to_s.gsub(/^\s*#/, '')
   end
 
   def tag_with_sharp(tag)
@@ -98,6 +95,3 @@ module RedmineTagging::Patches::QueryPatch
   end
 end
 
-unless Query.included_modules.include? RedmineTagging::Patches::QueryPatch
-  Query.send :include, RedmineTagging::Patches::QueryPatch
-end
