@@ -11,34 +11,7 @@ module TaggingPlugin
       end
 
       def view_layouts_base_html_head(context = {})
-        tagging_stylesheet = stylesheet_link_tag 'tagging', plugin: 'redmine_tagging'
-
-        unless ((sidebar_tagcloud? &&
-          context[:controller].is_a?(WikiController)) ||
-          (context[:controller].is_a?(IssuesController) &&
-            context[:controller].action_name == 'bulk_edit'))
-          return tagging_stylesheet
-        end
-
-        sidebar_tags = if sidebar_tagcloud?
-          tag_cloud = render_partial_to_string(context, 'tagging/tagcloud_search')
-          "$('#sidebar').append(\"#{escape_javascript(tag_cloud)}\")"
-        else
-          ''
-        end
-
-        <<-TAGS
-#{ tagging_stylesheet }
-        #{ javascript_include_tag 'toggle_tags', plugin: 'redmine_tagging' }
-          <script type="text/javascript">
-            //<![CDATA[
-            $(function() {
-              #{sidebar_tags}
-              $('#cloud_content').toggleCloudViaFor($('#cloud_trigger'), $('#issue_tags'))
-            })
-            //]]>
-          </script>
-        TAGS
+        stylesheet_link_tag 'tagging', plugin: 'redmine_tagging'
       end
 
       def view_issues_show_details_bottom(context = {})
