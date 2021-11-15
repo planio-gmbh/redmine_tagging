@@ -1,4 +1,4 @@
-class FixBrokenIssueAndWikiContexts < ActiveRecord::Migration
+class FixBrokenIssueAndWikiContexts < ActiveRecord::Migration[4.2]
   def self.remove_tagging(tagging)
     tag = tagging.tag
     tagging.destroy
