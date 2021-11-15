@@ -1,12 +1,12 @@
 module RedmineTagging::Patches::QueryPatch
 
   def self.apply
-    Query.send :prepend, self unless Query < self
+    IssueQuery.send :prepend, self unless IssueQuery < self
   end
 
   def self.prepended(base)
     base.class_eval do
-      add_available_column QueryColumn.new(:issue_tags, :caption => :field_tags)
+      add_available_column QueryColumn.new(:issue_tags, caption: :field_tags)
     end
   end
 

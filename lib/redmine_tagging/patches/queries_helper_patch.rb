@@ -14,15 +14,12 @@ module RedmineTagging::Patches::QueriesHelperPatch
   end
 
   def column_content_with_tags(column, issue)
-    value = column.value_object(issue)
+    return column_content_without_tags(column, issue) unless column.name == :issue_tags
 
-    if value.class.name == 'Array' && value.first.class.name == 'IssueTag'
-      links = value.map do |issue_tag|
-        link_to_project_tag_filter(@project, issue_tag.tag)
-      end
-      links.join(', ')
-    else
-      column_content_without_tags(column, issue)
+    value = column.value_object(issue)
+    links = value.to_a.map do |issue_tag|
+      link_to_project_tag_filter(@project, issue_tag.tag)
     end
+    safe_join links, ' '
   end
 end
