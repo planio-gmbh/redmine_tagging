@@ -2,8 +2,8 @@ class IssueTagsController < ApplicationController
   unloadable
 
   model_object ActsAsTaggableOn::Tag
-  before_filter :find_model_object
-  before_filter :find_project_by_project_id
+  before_action :find_model_object
+  before_action :find_project_by_project_id
 
   def destroy
     tag = @object
