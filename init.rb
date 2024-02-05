@@ -98,8 +98,13 @@ Rails.configuration.to_prepare do
   RedmineTagging::Patches::QueryPatch.apply
   RedmineTagging::Patches::QueriesHelperPatch.apply
   RedmineTagging::Patches::WikiPagePatch.apply
+  RedmineTagging::Patches::WikiPagePatch.apply
 
-  ApplicationController.send :helper, RedmineTagging::Patches::ApplicationHelperPatch
+  # be more explicit about where the helper is included, patching ApplicationHelper is brittle
+  IssuesController.send :helper, RedmineTagging::Patches::ApplicationHelperPatch
+  WikiController.send :helper, RedmineTagging::Patches::ApplicationHelperPatch
+  ReportsController.send :helper, RedmineTagging::Patches::ApplicationHelperPatch
+
   ProjectsController.send :helper, RedmineTagging::Patches::ProjectSettingsTabs
 end
 

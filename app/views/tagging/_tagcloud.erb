@@ -2,7 +2,7 @@
 
 <div id='tagcloud'>
   <%
-    tag_cloud_in_project(@project) do |tag, factor|
+    RedmineTagging::Tagcloud.new.tag_cloud_in_project(@project) do |tag, factor|
       options = {}
       if RedmineTagging.dynamic_font_size?
         options[:style] = "font-size: #{10 * factor + 9}pt"
