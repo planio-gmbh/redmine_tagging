@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module TaggingPlugin
-  module Hooks
+  module TaggingHooks
     class LayoutHook < Redmine::Hook::ViewListener
 
       def view_issues_sidebar_planning_bottom(context = {})
