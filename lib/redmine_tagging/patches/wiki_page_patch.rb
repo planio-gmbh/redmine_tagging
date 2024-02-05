@@ -13,7 +13,7 @@ module RedmineTagging::Patches::WikiPagePatch
 
       before_save :update_tags
 
-      searchable_options[:columns] << "#{WikiPageTag.table_name}.tag"
+      searchable_options[:columns] << "tags.name"
 
       original_scope = searchable_options[:scope] || self
 
@@ -21,7 +21,11 @@ module RedmineTagging::Patches::WikiPagePatch
         (original_scope.respond_to?(:call) ?
           original_scope.call(*args) :
           original_scope
-        ).includes :wiki_page_tags
+        ).joins(<<-SQL
+          LEFT JOIN taggings ON taggings.taggable_type = 'WikiPage' AND taggings.taggable_id = #{WikiPage.table_name}.id
+          LEFT JOIN tags ON tags.id = taggings.tag_id
+        SQL
+        )
       }
     end
   end

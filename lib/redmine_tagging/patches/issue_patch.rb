@@ -15,7 +15,7 @@ module RedmineTagging::Patches::IssuePatch
 
       has_many :issue_tags
 
-      searchable_options[:columns] << "#{IssueTag.table_name}.tag"
+      searchable_options[:columns] << "tags.name"
 
       original_scope = searchable_options[:scope] || self
 
@@ -23,7 +23,11 @@ module RedmineTagging::Patches::IssuePatch
         (original_scope.respond_to?(:call) ?
           original_scope.call(*args) :
           original_scope
-        ).includes :issue_tags
+        ).joins(<<-SQL
+          LEFT JOIN taggings ON taggings.taggable_type = 'Issue' AND taggings.taggable_id = #{Issue.table_name}.id
+          LEFT JOIN tags ON tags.id = taggings.tag_id
+        SQL
+        )
       }
     end
   end

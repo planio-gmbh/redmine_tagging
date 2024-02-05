@@ -1,5 +1,4 @@
 class IssueTagsController < ApplicationController
-  unloadable
 
   model_object ActsAsTaggableOn::Tag
   before_action :find_model_object
