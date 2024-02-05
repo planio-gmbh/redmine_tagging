@@ -52,25 +52,27 @@ class IssuesControllerTest < ActionController::TestCase
   end
 
   def test_can_show_api
-    get :show, id: @issue_with_tags.id, format: 'xml'
+    get :show, params: { id: @issue_with_tags.id }, format: 'xml'
     assert_response :success
   end
 
   def test_index_api_rsb_should_not_raise_in_project_issues
-    get :index, project_id: @project_with_tags.id
+    get :index, params: { project_id: @project_with_tags.id }
   end
 
   def test_can_show_api_for_some_project
-    get :index, format: 'json', project_id: @project_with_tags.id
+    get :index, format: 'json', params: { project_id: @project_with_tags.id }
     assert_response :success
   end
 
   def test_bulk_update_with_project_change_should_success
     tag_input = '"1 2 \\\\ 3 cool/tag 777    '
 
-    put :bulk_update, ids: @issues_to_bulk_edit.map(&:id),
-      issue: { project_id: @another_project.id, tags: tag_input },
-      append_tags: 'on'
+    put :bulk_update, params: {
+        ids: @issues_to_bulk_edit.map(&:id),
+        issue: { project_id: @another_project.id, tags: tag_input },
+        append_tags: 'on'
+    }
 
     assert_response :redirect
 
@@ -84,7 +86,7 @@ class IssuesControllerTest < ActionController::TestCase
 
   def test_bulk_update_without_project_change_should_success
     tag_input = '"1 2 \\\\ 3 cool/tag 777    '
-    put :bulk_update, { ids: @issues_to_bulk_edit.map(&:id), issue: { tags: tag_input }, 'append_tags' => 'on' }
+    put :bulk_update, params: { ids: @issues_to_bulk_edit.map(&:id), issue: { tags: tag_input }, 'append_tags' => 'on' }
     assert_response :redirect
 
     @issue_with_tags.reload
@@ -95,7 +97,7 @@ class IssuesControllerTest < ActionController::TestCase
   end
 
   def test_bulk_update_without_tags_field_should_not_drop_tags
-    put :bulk_update, { :ids => @issues_to_bulk_edit.map(&:id), issue: { status_id: 1 } }
+    put :bulk_update, params: { :ids => @issues_to_bulk_edit.map(&:id), issue: { status_id: 1 } }
     assert_response :redirect
 
     @issue_with_tags.reload
@@ -106,7 +108,7 @@ class IssuesControllerTest < ActionController::TestCase
   end
 
   def test_update_without_tags_field_should_not_drop_tags
-    put :update, id: @issue_with_tags.id, issue: { status_id: 1 }
+    put :update, params: { id: @issue_with_tags.id, issue: { status_id: 1 } }
     assert_response :redirect
 
     @issue_with_tags.reload

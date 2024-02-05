@@ -29,7 +29,7 @@ class CalendarsControllerTest < ActionController::TestCase
   end
 
   def test_can_show_calendar
-    get :show, project_id: @project_with_tags.id
+    get :show, params: { project_id: @project_with_tags.id }
     assert_response :success
   end
 end

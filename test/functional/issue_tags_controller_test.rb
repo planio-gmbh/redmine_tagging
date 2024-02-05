@@ -31,7 +31,7 @@ class IssueTagsControllerTest < ActionController::TestCase
   def test_should_destroy_issue_tag
     @tag_id = ActsAsTaggableOn::Tag.find_by_name('#4').id
 
-    delete 'destroy', project_id: @project_with_tags.id, id: @tag_id
+    delete 'destroy', params: { project_id: @project_with_tags.id, id: @tag_id }
     assert_response :redirect
 
     tag_rem = ActsAsTaggableOn::Tag.count
@@ -44,7 +44,7 @@ class IssueTagsControllerTest < ActionController::TestCase
     @issue_with_tags.reload
 
     @tag_id = ActsAsTaggableOn::Tag.find_by_name('#4').id
-    delete 'destroy', project_id: @another_project.id, id: @tag_id
+    delete 'destroy', params: { project_id: @another_project.id, id: @tag_id }
     assert_response :redirect
 
     tag_rem = ActsAsTaggableOn::Tag.count

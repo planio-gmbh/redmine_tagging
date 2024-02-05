@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class TaggingTest < ActionDispatch::IntegrationTest
+class TaggingTest < Redmine::IntegrationTest
   fixtures :projects,
     :users,
     :roles,
@@ -54,10 +54,10 @@ class TaggingTest < ActionDispatch::IntegrationTest
       'tags'        => '10 11 12'
     }
 
-    get_via_redirect(new_project_issue_path(@project_with_tags))
+    get(new_project_issue_path(@project_with_tags))
     assert_response :success
-    post_via_redirect(issues_path, issue: @new_issue_attrs)
-    assert_response :success
+    post(issues_path, params: { issue: @new_issue_attrs })
+    assert_response :redirect
 
     new_issue = Issue.find_by_subject('new_issue')
     assert_equal 3, new_issue.taggings.size
@@ -73,12 +73,10 @@ class TaggingTest < ActionDispatch::IntegrationTest
     issue_attrs['tracker'] = @another_project.trackers.first
     issue_attrs['tags'] = '10 11 12'
 
-    get_via_redirect(edit_issue_path(@issue_with_tags))
+    get(edit_issue_path(@issue_with_tags))
     assert_response :success
-    put_via_redirect(issue_path(@issue_with_tags), issue: issue_attrs)
-    assert_response :success
-    get_via_redirect(issue_path(@issue_with_tags))
-    assert_response :success
+    put(issue_path(@issue_with_tags), params: { issue: issue_attrs })
+    assert_redirected_to(issue_path(@issue_with_tags))
 
     @issue_with_tags.reload
     assert_equal 3, @issue_with_tags.taggings.size
@@ -86,6 +84,7 @@ class TaggingTest < ActionDispatch::IntegrationTest
   end
 
   def test_should_create_inline_issue_tags
+    skip "inline tags are disabled"
     Setting.plugin_redmine_tagging["issues_inline"] = '1'
 
     @new_issue_attrs = {
@@ -95,10 +94,10 @@ class TaggingTest < ActionDispatch::IntegrationTest
       'description' => '{{tag(10 11 12)}}'
     }
 
-    get_via_redirect(new_project_issue_path(@project_with_tags))
+    get(new_project_issue_path(@project_with_tags))
     assert_response :success
-    post_via_redirect(issues_path, issue: @new_issue_attrs)
-    assert_response :success
+    post issues_path, params: { issue: @new_issue_attrs }
+    assert_response :redirect
 
     new_issue = Issue.find_by_subject('new_issue')
     assert_equal 3, new_issue.taggings.size
@@ -106,6 +105,7 @@ class TaggingTest < ActionDispatch::IntegrationTest
   end
 
   def test_should_update_inline_issue_tags
+    skip "inline tags are disabled"
     Setting.plugin_redmine_tagging["issues_inline"] = '1'
 
     issue_attrs = @issue_with_tags.attributes
@@ -114,12 +114,10 @@ class TaggingTest < ActionDispatch::IntegrationTest
     issue_attrs['tracker'] = @another_project.trackers.first
     issue_attrs['description'] = '{{tag(6)}} {{tag(7 8)}}'
 
-    get_via_redirect(edit_issue_path(@issue_with_tags))
+    get(edit_issue_path(@issue_with_tags))
     assert_response :success
-    put_via_redirect(issue_path(@issue_with_tags), issue: issue_attrs)
-    assert_response :success
-    get_via_redirect(issue_path(@issue_with_tags))
-    assert_response :success
+    put(issue_path(@issue_with_tags), params: { issue: issue_attrs })
+    assert_redirected_to issue_path(@issue_with_tags)
 
     @issue_with_tags.reload
     assert_equal 2, @issue_with_tags.taggings.count
@@ -127,8 +125,8 @@ class TaggingTest < ActionDispatch::IntegrationTest
   end
 
   def test_should_generate_wiki_tagcloud
-    edit_page_path = edit_wiki_cpath(@project_with_wiki_tags, 'newpage')
-    page_path = wiki_cpath(@project_with_wiki_tags, 'newpage')
+    edit_page_path = edit_wiki_cpath(@project_with_wiki_tags, 'Some_wiki_page')
+    page_path = wiki_cpath(@project_with_wiki_tags, 'Some_wiki_page')
 
     page_content = @wiki_page_with_tags_content.attributes.merge(
       'text' => '{{tag(11)}} {{tag(14 15)}} {{tagcloud}}'
@@ -136,11 +134,11 @@ class TaggingTest < ActionDispatch::IntegrationTest
 
     page_attrs = @wiki_page_with_tags.attributes
 
-    get_via_redirect(edit_page_path)
+    get(edit_page_path)
     assert_response :success
-    put_via_redirect(page_path, wiki_page: page_attrs, content: page_content)
-    assert_response :success
-    get_via_redirect(page_path)
+    put(page_path, params: { wiki_page: page_attrs, content: page_content })
+    assert_redirected_to page_path
+    get page_path
     assert_response :success
   end
 
@@ -155,11 +153,12 @@ class TaggingTest < ActionDispatch::IntegrationTest
     page_attrs['title'] = 'Newpage'
     page_attrs['tags'] = '10 11 12'
 
-    get_via_redirect(edit_page_path)
+    get(edit_page_path)
     assert_response :success
-    put_via_redirect(page_path, wiki_page: page_attrs, content: page_content)
-    assert_response :success
-    get_via_redirect(page_path)
+    put(page_path, params: { wiki_page: page_attrs, content: page_content })
+    page_path = wiki_cpath(@project_with_wiki_tags, 'Newpage')
+    assert_redirected_to page_path
+    get page_path
     assert_response :success
 
     new_page = WikiPage.find_by_title('Newpage')
@@ -176,11 +175,11 @@ class TaggingTest < ActionDispatch::IntegrationTest
     page_attrs = @wiki_page_with_tags.attributes
     page_attrs['tags'] = '10 11 12'
 
-    get_via_redirect(edit_page_path)
+    get(edit_page_path)
     assert_response :success
-    put_via_redirect(page_path, wiki_page: page_attrs, content: page_content)
-    assert_response :success
-    get_via_redirect(page_path)
+    put(page_path, params: { wiki_page: page_attrs, content: page_content })
+    assert_redirected_to page_path
+    get page_path
     assert_response :success
 
     @wiki_page_with_tags.reload
@@ -189,6 +188,7 @@ class TaggingTest < ActionDispatch::IntegrationTest
   end
 
   def test_should_create_inline_wiki_page_tags
+    skip "inline tags are disabled"
     Setting.plugin_redmine_tagging["wiki_pages_inline"] = '1'
 
     edit_page_path = edit_wiki_cpath(@project_with_wiki_tags, 'newpage')
@@ -202,11 +202,11 @@ class TaggingTest < ActionDispatch::IntegrationTest
       'title' => 'Newpage'
     )
 
-    get_via_redirect(edit_page_path)
+    get(edit_page_path)
     assert_response :success
-    put_via_redirect(page_path, wiki_page: page_attrs, content: page_content)
-    assert_response :success
-    get_via_redirect(page_path)
+    put(page_path, params: { wiki_page: page_attrs, content: page_content })
+    assert_redirected_to page_path
+    get page_path
     assert_response :success
 
     new_page = WikiPage.find_by_title('Newpage')
@@ -215,6 +215,7 @@ class TaggingTest < ActionDispatch::IntegrationTest
   end
 
   def test_should_update_inline_wiki_page_tags
+    skip "inline tags are disabled"
     Setting.plugin_redmine_tagging["wiki_pages_inline"] = '1'
 
     edit_page_path = edit_wiki_cpath(@project_with_wiki_tags, @wiki_page_with_tags.title)
@@ -226,11 +227,11 @@ class TaggingTest < ActionDispatch::IntegrationTest
 
     page_attrs = @wiki_page_with_tags.attributes
 
-    get_via_redirect(edit_page_path)
+    get(edit_page_path)
     assert_response :success
-    put_via_redirect(page_path, wiki_page: page_attrs, content: page_content)
-    assert_response :success
-    get_via_redirect(page_path)
+    put(page_path, params: { wiki_page: page_attrs, content: page_content })
+    assert_redirected_to page_path
+    get page_path
     assert_response :success
 
     @wiki_page_with_tags.reload
