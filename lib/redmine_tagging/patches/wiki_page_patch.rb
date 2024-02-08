@@ -6,7 +6,6 @@ module RedmineTagging::Patches::WikiPagePatch
 
   def self.prepended(base)
     base.class_eval do
-      has_many :wiki_page_tags
 
       acts_as_taggable
       safe_attributes :tags
@@ -29,6 +28,12 @@ module RedmineTagging::Patches::WikiPagePatch
       }
     end
   end
+
+  def wiki_page_tags
+    ActsAsTaggableOn::Tag.joins('LEFT JOIN taggings ON taggings.tag_id = tags.id')
+      .where("taggings.taggable_type = 'WikiPage' and taggings.taggable_id = ?", id)
+  end
+
 
   def tags=(new_tags)
     if new_tags

@@ -13,8 +13,6 @@ module RedmineTagging::Patches::IssuePatch
 
       after_save :cleanup_tags
 
-      has_many :issue_tags
-
       searchable_options[:columns] << "tags.name"
 
       original_scope = searchable_options[:scope] || self
@@ -31,6 +29,7 @@ module RedmineTagging::Patches::IssuePatch
       }
     end
   end
+
 
   def create_journal
     if @current_journal
@@ -54,6 +53,11 @@ module RedmineTagging::Patches::IssuePatch
       @issue_tags_before_change = TaggingPlugin::TagsHelper.to_string(tag_list_on(tag_context))
     end
     super(user, notes)
+  end
+
+  def issue_tags
+    ActsAsTaggableOn::Tag.joins('LEFT JOIN taggings ON taggings.tag_id = tags.id')
+      .where("taggings.taggable_type = 'Issue' and taggings.taggable_id = ?", id)
   end
 
   def tags
