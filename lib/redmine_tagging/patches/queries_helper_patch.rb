@@ -18,7 +18,7 @@ module RedmineTagging::Patches::QueriesHelperPatch
 
     value = column.value_object(issue)
     links = value.to_a.map do |issue_tag|
-      link_to_project_tag_filter(@project, issue_tag.tag)
+      link_to_project_tag_filter(@project, issue_tag.name)
     end
     safe_join links, ' '
   end

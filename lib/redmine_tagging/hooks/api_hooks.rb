@@ -5,7 +5,7 @@ module TaggingPlugin
         api, issue = options.values_at :api, :issue
         api.array :tags do
           issue.issue_tags.each do |issue_tag|
-            api.tag(:id => issue_tag.tag[1..-1])
+            api.tag(:id => issue_tag.name[1..-1])
           end
         end
       end
@@ -14,7 +14,7 @@ module TaggingPlugin
         api, issue = options.values_at :api, :issue
         api.array :tags do
           issue.issue_tags.each do |issue_tag|
-            api.tag(:id => issue_tag.tag[1..-1])
+            api.tag(:id => issue_tag.name[1..-1])
           end
         end
       end
