@@ -103,6 +103,7 @@ Rails.configuration.to_prepare do
   IssuesController.send :helper, RedmineTagging::Patches::ApplicationHelperPatch
   WikiController.send :helper, RedmineTagging::Patches::ApplicationHelperPatch
   ReportsController.send :helper, RedmineTagging::Patches::ApplicationHelperPatch
+  ProjectsController.send :helper, RedmineTagging::Patches::ApplicationHelperPatch
 
   ProjectsController.send :helper, RedmineTagging::Patches::ProjectSettingsTabs
 end
