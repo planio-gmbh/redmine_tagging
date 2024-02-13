@@ -57,6 +57,8 @@ module RedmineTagging
           end
           yield tag, factor
         end
+      else
+        []
       end
     end
 
