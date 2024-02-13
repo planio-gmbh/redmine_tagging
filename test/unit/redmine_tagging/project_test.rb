@@ -6,7 +6,8 @@ class RedmineTagging::ProjectTest < ActiveSupport::TestCase
            :projects_trackers,
            :roles,
            :member_roles,
-           :members
+           :members,
+           :versions
 
   def test_find_all_tags_for_project
     project1 = Project.find(1)
