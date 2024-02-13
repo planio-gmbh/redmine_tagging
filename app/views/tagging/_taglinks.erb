@@ -2,7 +2,7 @@
   <div class="label"><%= l(:field_tags) %>:</div>
   <div>
   <% tags.each do |tag| %>
-    <%= link_to_project_tag_filter(@project, tag) %>
+    <%= link_to tag, project_issues_path(@project, RedmineTagging::Tagcloud.tag_filter_link_options(tag)) %>
   <% end %>
   </div>
 </div>

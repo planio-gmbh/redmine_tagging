@@ -17,6 +17,7 @@ Redmine::Plugin.register :redmine_tagging do
   Redmine::WikiFormatting::Macros.register do
     desc 'Wiki/Issues tagcloud'
     macro :tagcloud do |obj, args|
+      begin
       args, options = extract_macro_options(args, :parent)
 
       return if params[:controller] == 'mailer'
@@ -33,10 +34,14 @@ Redmine::Plugin.register :redmine_tagging do
 
       if project # this may be an attempt to render tag cloud when deleting wiki page
         if [WikiContent, WikiContent::Version, NilClass].include?(obj.class)
-          render partial: 'tagging/tagcloud_search', project: project
+          render RedmineTagging::Tagcloud.new(project, link_to: :wiki)
         elsif [Journal, Issue].include?(obj.class)
-          render partial: 'tagging/tagcloud', project: project
+          render RedmineTagging::Tagcloud.new(project)
         end
+      end
+      rescue
+        puts $!
+        raise $!
       end
     end
   end
@@ -98,12 +103,6 @@ Rails.configuration.to_prepare do
   RedmineTagging::Patches::QueryPatch.apply
   RedmineTagging::Patches::QueriesHelperPatch.apply
   RedmineTagging::Patches::WikiPagePatch.apply
-
-  # be more explicit about where the helper is included, patching ApplicationHelper is brittle
-  IssuesController.send :helper, RedmineTagging::Patches::ApplicationHelperPatch
-  WikiController.send :helper, RedmineTagging::Patches::ApplicationHelperPatch
-  ReportsController.send :helper, RedmineTagging::Patches::ApplicationHelperPatch
-  ProjectsController.send :helper, RedmineTagging::Patches::ApplicationHelperPatch
 
   ProjectsController.send :helper, RedmineTagging::Patches::ProjectSettingsTabs
 end

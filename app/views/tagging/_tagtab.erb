@@ -9,13 +9,13 @@
   <th></th>
   </tr></thead>
   <tbody>
-<% for issue_tag in tags %>
+<% for tag in tags %>
   <tr class="<%= cycle 'odd', 'even' %>">
     <td>
-      <%= link_to_project_tag_filter(@project, issue_tag.name) %>
+      <%= link_to tag.name, project_issues_path(@project, RedmineTagging::Tagcloud.tag_filter_link_options(tag.name)) %>
     </td>
     <td class="buttons">
-      <%= link_to(l(:detach), {:controller => 'issue_tags', :action => 'destroy', :id => issue_tag.id,
+      <%= link_to(l(:detach), {:controller => 'issue_tags', :action => 'destroy', :id => tag.id,
         :project_id => @project.id },
         :method => :delete,
         :class => 'icon icon-del') %>

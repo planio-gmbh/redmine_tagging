@@ -6,13 +6,13 @@ module TaggingPlugin
 
       def view_issues_sidebar_planning_bottom(context = {})
         if RedmineTagging.sidebar_tagcloud? and context[:project].present?
-          render_partial_to_string(context, 'tagging/tagcloud')
+          context[:controller].send :render, RedmineTagging::Tagcloud.new(context[:project])
         end
       end
 
       def view_wiki_show_sidebar_bottom(context = {})
         if RedmineTagging.sidebar_tagcloud?
-          render_partial_to_string(context, 'tagging/tagcloud_search')
+          context[:controller].send :render, RedmineTagging::Tagcloud.new(context[:project], link_to: :wiki)
         end
       end
 

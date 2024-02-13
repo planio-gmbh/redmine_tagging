@@ -12,30 +12,21 @@
 <% for tag in rows %>
 <tr class="<%= cycle("odd", "even") %>">
   <td>
-    <%= link_to_project_tag_filter(@project, tag.name) %>
+    <%= link_to tag.name, project_issues_path(@project, RedmineTagging::Tagcloud.tag_filter_link_options(tag.name)) %>
   </td>
   <td align="center">
-    <%= link_to_project_tag_filter(
-      @project,
-      tag.name,
-      :status => "o",
-      :title => aggregate(data, { field_name => tag.id, "closed" => 0 }))
+    <%= link_to aggregate(data, { field_name => tag.id, "closed" => 0 }),
+                project_issues_path(@project, RedmineTagging::Tagcloud.tag_filter_link_options(tag.name))
     %>
   </td>
   <td align="center">
-    <%= link_to_project_tag_filter(
-      @project,
-      tag.name,
-      :status => "c",
-      :title => aggregate(data, { field_name => tag.id, "closed" => 1 }))
+    <%= link_to aggregate(data, { field_name => tag.id, "closed" => 1 }),
+                project_issues_path(@project, RedmineTagging::Tagcloud.tag_filter_link_options(tag.name, status: 'c'))
     %>
   </td>
   <td align="center">
-    <%= link_to_project_tag_filter(
-      @project,
-      tag.name,
-      :status => "*",
-      :title => aggregate(data, { field_name => tag.id }))
+    <%= link_to aggregate(data, { field_name => tag.id }),
+                project_issues_path(@project, RedmineTagging::Tagcloud.tag_filter_link_options(tag.name, status: '*'))
     %>
   </td>
 </tr>

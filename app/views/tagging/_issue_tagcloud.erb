@@ -1,13 +1,8 @@
 <a id="cloud_trigger"><b><%= t(:tags_in_project) %></b></a>
 <span id="cloud_content"> &mdash;
-  <%
-    RedmineTagging::Tagcloud.new.tag_cloud_in_project(@project) do |tag, factor|
-      style = "font-size: #{10 * factor + 9}pt"
-  %>
+  <% RedmineTagging::Tagcloud.tag_cloud_in_project(@project) do |tag, factor| %>
     <a class="tag_item"
-       data-tag="<%= tag_without_sharp(tag) %>"
-       style="<%= style %>">
-          <%= tag %>
-    </a> 
+       data-tag="<%= j tag.sub /^#/, '' %>"
+       style="<%= "font-size: #{10 * factor + 9}pt" %>"><%= tag %></a> 
   <% end %>
 </span>
