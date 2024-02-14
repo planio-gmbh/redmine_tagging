@@ -44,6 +44,13 @@ class IssuesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "index with tags query column" do
+    get :index, params: { project_id: @project_with_tags.identifier, set_filter: 1, 'c[]': 'issue_tags' }
+    assert_response :success
+    assert_select 'td a', text: /#1/
+    assert_select 'td a', text: /#2/
+  end
+
   def test_can_index_issues_when_custom_fields_available
     IssueCustomField.create!(
       name:          'cfield',
