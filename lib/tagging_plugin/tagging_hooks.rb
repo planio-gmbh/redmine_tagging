@@ -119,7 +119,7 @@ module TaggingPlugin
               controller: 'search',
               action:     'index',
               project_id: project,
-              q:          tag_without_sharp(tag),
+              q:          tag.to_s.sub(/^#/, ''),
               wiki_pages: true,
               issues:     true })
           end.join('&nbsp;')
