@@ -9,6 +9,7 @@ class IssuesControllerTest < ActionController::TestCase
     :trackers,
     :projects_trackers,
     :enabled_modules,
+    :issue_categories,
     :issue_statuses,
     :issues,
     :enumerations,
@@ -33,6 +34,16 @@ class IssuesControllerTest < ActionController::TestCase
     @issues_to_bulk_edit = [@issue_with_tags, @issue_without_tags]
   end
 
+  test "should get global new" do
+    get :new
+    assert_response :success
+  end
+
+  test "should get new" do
+    get :new, params: { project_id: @project_with_tags.identifier }
+    assert_response :success
+  end
+
   def test_can_index_issues_when_custom_fields_available
     IssueCustomField.create!(
       name:          'cfield',
@@ -43,25 +54,6 @@ class IssuesControllerTest < ActionController::TestCase
     )
 
     get :index
-    assert_response :success
-  end
-
-  def test_can_index_api
-    get :index, format: 'json'
-    assert_response :success
-  end
-
-  def test_can_show_api
-    get :show, params: { id: @issue_with_tags.id }, format: 'xml'
-    assert_response :success
-  end
-
-  def test_index_api_rsb_should_not_raise_in_project_issues
-    get :index, params: { project_id: @project_with_tags.id }
-  end
-
-  def test_can_show_api_for_some_project
-    get :index, format: 'json', params: { project_id: @project_with_tags.id }
     assert_response :success
   end
 

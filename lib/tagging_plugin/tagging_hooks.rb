@@ -53,7 +53,11 @@ module TaggingPlugin
           result += javascript_include_tag 'toggle_tags', plugin: 'redmine_tagging'
         end
 
-        result + issue_cloud_javascript(context)
+        if context[:project]
+          result += issue_cloud_javascript(context)
+        end
+
+        result
       end
 
       def controller_issues_bulk_edit_before_save(context={})
