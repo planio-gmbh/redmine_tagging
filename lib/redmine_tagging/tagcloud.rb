@@ -29,16 +29,13 @@ module RedmineTagging
 
     def self.tag_cloud_in_project(project)
       tags = {}
-
       context = TaggingPlugin::ContextHelper.context_for(project)
-
-      Issue.tag_counts_on(context).each do |tag|
+      project.issues.tag_counts_on(context).each do |tag|
         tags[tag.name] = tag.count
       end
-
-      WikiPage.tag_counts_on(context).each do |tag|
+      project.wiki.pages.tag_counts_on(context).each do |tag|
         tags[tag.name] = tags[tag.name].to_i + tag.count
-      end
+      end if project.wiki
 
       tags.reject!{|key, value| value == 0 }
 
