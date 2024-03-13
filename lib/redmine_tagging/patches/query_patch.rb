@@ -23,6 +23,9 @@ module RedmineTagging::Patches::QueryPatch
   def available_tags_filter
     if project.nil?
       # dead code branch, see above
+      # we could attempt to find all tags that are used on issues the current
+      # user can actually see. Problems may still arise when a user then saves
+      # such a query
       tags = ActsAsTaggableOn::Tag.where(
           "id in (select tag_id from taggings where taggable_type = 'Issue')"
       )
