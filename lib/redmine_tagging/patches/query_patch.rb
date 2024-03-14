@@ -13,36 +13,33 @@ module RedmineTagging::Patches::QueryPatch
   def available_filters
     unless @available_filters
       super
-      if project
-        @available_filters.merge!(available_tags_filter)
-      end
+      @available_filters.merge!(available_tags_filter)
     end
     @available_filters
   end
 
   def available_tags_filter
     if project.nil?
-      # dead code branch, see above
-      # we could attempt to find all tags that are used on issues the current
-      # user can actually see. Problems may still arise when a user then saves
-      # such a query
-      tags = ActsAsTaggableOn::Tag.where(
-          "id in (select tag_id from taggings where taggable_type = 'Issue')"
-      )
+      visible_projects = Project.visible.active.allowed_to(User.current, :view_issues)
+      contexts = visible_projects.map{|p| TaggingPlugin::ContextHelper.context_for p}
     else
-      context = TaggingPlugin::ContextHelper.context_for(project)
-      tags = ActsAsTaggableOn::Tag.where(
-          "id in (select tag_id from taggings where taggable_type = 'Issue' and context = ?)",
-          context
-      )
+      contexts = [TaggingPlugin::ContextHelper.context_for(project)]
     end
-    tags = tags.sort_by { |t| t.name.downcase }.map do |tag|
-      [tag_without_sharp(tag), tag_without_sharp(tag)]
+
+    tags = ActsAsTaggableOn::Tag.
+      joins(:taggings).
+      where(taggings: {taggable_type: 'Issue', context: contexts}).
+      distinct
+
+    values = tags.sort_by{|t| t.name.downcase}.map do |tag|
+      value = tag_without_sharp(tag.name)
+      [value, value]
     end
+
     field = 'tags'
     options = {
       type:   :list_optional,
-      values: tags,
+      values: values,
       name:   l(:field_tags),
       order:  21,
     }
