@@ -20,7 +20,7 @@ module RedmineTagging::Patches::QueryPatch
 
   def available_tags_filter
     if project.nil?
-      visible_projects = Project.visible.active.allowed_to(User.current, :view_issues)
+      visible_projects = Project.allowed_to(User.current, :view_issues)
       contexts = visible_projects.map{|p| TaggingPlugin::ContextHelper.context_for p}
     else
       contexts = [TaggingPlugin::ContextHelper.context_for(project)]
