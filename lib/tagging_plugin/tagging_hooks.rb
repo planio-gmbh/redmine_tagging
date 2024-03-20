@@ -164,13 +164,12 @@ module TaggingPlugin
         <<-HTML
           <p>
             <label>#{ l(:field_tags) }</label>
-            #{ text_field_tag 'issue[tags]', '', size: 18 }<br>
-            <input type="checkbox" name="append_tags" checked="checked" />
-            #{ l(:append_tags) }<br>
+            #{ text_field_tag 'issue[tags]', '', size: 18 }
+            <label class="inline" for="append_tags"><input type="checkbox" id="append_tags" name="append_tags" checked="checked" />
+            #{ l(:append_tags) }
+            </label>
           </p>
-          <p>
-            #{ render_partial_to_string(context, 'tagging/issue_tagcloud') }
-          </p>
+          #{ issue_cloud_javascript(context) }
         HTML
       end
 
@@ -203,11 +202,9 @@ module TaggingPlugin
       end
 
       def issue_cloud_javascript(context)
-        tag_context = ContextHelper.context_for(context[:issue].project)
-        ac          = ActsAsTaggableOn::Tag.where(
-          "id in (select tag_id from taggings where taggable_type in ('WikiPage', 'Issue') and context = ?)",
-          tag_context)
-        ac          = ac.map { |tag| "'#{escape_javascript(tag.to_s.gsub(/^\s*#/, ''))}'" }.join(', ')
+        project = context[:issue]&.project || context[:project]
+        tags = RedmineTagging.visible_tags(project: project)
+        json_tags = tags.map{|tag| tag.to_s.sub(/^\s*#/, '')}.to_json
 
         cloud = render_partial_to_string(context, 'tagging/issue_tagcloud')
 
@@ -215,7 +212,7 @@ module TaggingPlugin
           <script type="text/javascript">
             //<![CDATA[
             $(document).ready(function() {
-              $('#issue_tags').tagSuggest({ tags: [#{ac}] });
+              $('#issue_tags').tagSuggest({ tags: #{json_tags} });
               var tags_container = $('#issue_tags').parent();
               var cloud = $("<div>#{escape_javascript(cloud)}</div>");
               $(tags_container).append(cloud);

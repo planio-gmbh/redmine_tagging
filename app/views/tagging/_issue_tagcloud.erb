@@ -1,4 +1,4 @@
-<a id="cloud_trigger"><b><%= t(:tags_in_project) %></b></a>
+<a id="cloud_trigger"><b><%= @project ? t(:tags_in_project) : t(:tags) %></b></a>
 <span id="cloud_content"> &mdash;
   <% RedmineTagging::Tagcloud.tag_cloud_in_project(@project) do |tag, factor| %>
     <a class="tag_item"

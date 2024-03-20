@@ -19,17 +19,7 @@ module RedmineTagging::Patches::QueryPatch
   end
 
   def available_tags_filter
-    if project.nil?
-      visible_projects = Project.allowed_to(User.current, :view_issues)
-      contexts = visible_projects.map{|p| TaggingPlugin::ContextHelper.context_for p}
-    else
-      contexts = [TaggingPlugin::ContextHelper.context_for(project)]
-    end
-
-    tags = ActsAsTaggableOn::Tag.
-      joins(:taggings).
-      where(taggings: {taggable_type: 'Issue', context: contexts}).
-      distinct
+    tags = RedmineTagging.visible_tags(project: project)
 
     values = tags.sort_by{|t| t.name.downcase}.map do |tag|
       value = tag_without_sharp(tag.name)
