@@ -9,6 +9,7 @@ class TaggingTest < Redmine::IntegrationTest
     :trackers,
     :projects_trackers,
     :enabled_modules,
+    :issue_categories,
     :issue_statuses,
     :issues,
     :enumerations,
