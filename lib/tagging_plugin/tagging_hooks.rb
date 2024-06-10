@@ -169,6 +169,8 @@ module TaggingPlugin
             #{ l(:append_tags) }
             </label>
           </p>
+          #{ javascript_include_tag 'tag', plugin: 'redmine_tagging' }
+          #{ javascript_include_tag 'toggle_tags', plugin: 'redmine_tagging' }
           #{ issue_cloud_javascript(context) }
         HTML
       end
